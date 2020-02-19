@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>uGym Courses</title>
+
+  <link rel="stylesheet" href="css/main.css">
+
+  <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+TC&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  
+  <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+  
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+  <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
+  <link rel="stylesheet" href="css/loading.css" />
+  <script src="js/loading.js"></script>
+
+  <style>
+    input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      border: 0;
+    }
+    .custom-file-upload {
+      border: 1px solid #ccc;
+      display: inline-block;
+      padding: 6px 12px;
+      cursor: pointer;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+
+<body >
+  <!--  for test-->
+  
+<!--
+  <button class="btn-red" onclick="window.location.href = '1-addMember.html';">FOR TEST ONLY!!!!!</button>
+  <button onclick="myFunctionA()">SignIn A</button>
+  <button onclick="myFunctionB()">SignIn B</button>
+
+  <button onclick="myFunction()">UserID</button>
+  <button onclick="myFunctionR()">Read Database</button>
+
+  <button onclick="myFunctionW()">Write Database</button>
+
+  <button onclick="myFunctionSignOut()">SignOut</button>
+-->
+
+  <!--  end of for test -->
+  
+  <!--  **** 標頭 ****-->
+  <div>
+    <button class="btn-blue" id="memberMangementBtn" onclick="memberManage()" style="float: right; margin-right: 10px" disabled="disabled" ><i class="fa fa-user"></i>&nbsp 客戶管理</button>
+    <button class="btn-blue" id="logToggle" onclick="logInAndOut()" style="float: right; margin-right: 10px; margin-left: 0px"><i class="fa fa-sign-in"></i>&nbsp 登入</button>
+    <button id="loginStatus" class="btn-blue" style="float: right; background-color: white; color: gray">請登入來寫入資料庫</button>
+
+<!--    <h1 id="titleHeader">三峽運動中心 - 團體課程管理</h1>-->
+    <h1 id="titleHeader">團體課程管理</h1> 
+  </div>
+  <hr>
+  <!--  **** 標頭:結束 ****-->
+  
+  <!--  **** 進行中課程的畫面 **** ?? 為什麼不包成一個大 DIV，方便 hide() 和 show()?? -->
+  <h2 id="inProgress">進行中課程</h2>
+  <button class="btn-blue" id="addCourseBtn" onclick="addCourse()"><i class="fa fa-plus"></i>&nbsp 新增課程</button>
+
+  <button class="btn-red" id="refreshBtn" onclick="readFromDB()" style="margin-left: 20px"><i class="fa fa-refresh"></i>&nbsp 刷新課程</button>
+
+  <table id="courseTable" class="display">
+    <thead>
+      <tr id="table-header">
+        <th style="width: 80px">課程編號</th>
+        <th>課程名稱</th>
+        <th style="width: 200px">老師</th>
+        <th style="width: 120px">時間</th>
+        <th style="width: 70px">卡路里燃燒</th>
+        <th style="width: 50px">課程費用</th>        
+        <th style="width: 50px">課程人數</th>
+        <th style="width: 50px">報名人數</th>
+        <th style="width: 50px">繳費人數</th>                
+        <th style="width: 150px">操作</th>
+
+      </tr>
+    </thead>
+  </table>
+  <!--  **** 進行中課程的畫面:結束 **** -->
+  
+  <!--  **** 課程歷史的畫面 **** ?? 為什麼不包成一個大 DIV，方便 hide() 和 show()?? -->  
+  <div id="spacerBetweenTables" style="height: 100px; text-align: ">
+    <div style="height: 50px"></div>
+    <hr>
+    <h2>課程歷史紀錄</h2>
+  </div>
+
+  <table id="courseHistoryTable" class="display" style="width:100%;">
+    <thead>
+      <tr id="table-header">
+        <th style="width: 80px">課程編號</th>
+        <th>課程名稱</th>
+        <th style="width: 200px">老師</th>
+        <th style="width: 120px">時間</th>
+        <th style="width: 70px">卡路里燃燒</th>
+        <th style="width: 50px">課程費用</th>          
+        <th style="width: 50px">課程人數</th>
+        <th style="width: 50px">報名人數</th>
+        <th style="width: 50px">繳費人數</th>            
+        <th style="width: 150px"></th>
+      </tr>
+    </thead>
+  </table>
+  <!--  **** 課程歷史的畫面:結束 **** -->
+
+  <!--  **** 新增課程的畫面，包成一個大 DIV，方便 hide() 和 show() **** -->
+  <div id="addCourse" style="height: 600px; font-family:'Noto Sans TC'">
+    <h2 id="courseNumber" value="00">新增團課課程 - U0000</h2>
+    <button class="btn-blue" onclick="addNewCoach()" style="margin-bottom: 0">查詢/新增 老師</button>
+    <div style="font-size: 20px;">
+      <div class="courseLabel">老師姓名</div> <input id="coachName" class="courseInput" type="text" placeholder="請輸入老師姓名"><br>     
+      
+      <div class="courseLabel">課程名稱</div> <input id="courseName" class="courseInput" type="text" placeholder="請輸入課程名稱"><br>
+
+      <div class="courseLabel">助教姓名</div> <input id="assistName" class="courseInput" type="text" placeholder="請輸入助教姓名"><br>
+
+      <div class="courseLabel">上課時間</div> 
+      <span>
+        <input id="courseDate" class="courseInput" type="date" style="width: 180px"> 
+        <input id="courseTime" class="courseInput"type="text"  style="width: 200px; height: 28px; margin-left: -10px" placeholder="例如:18:30~19:30">
+      </span>
+      <br>   
+
+      <div class="courseLabel">燃燒熱量</div> <input id="Calories" class="courseInput" type="text" placeholder="上課會燃燒的卡路里"><br>
+
+      <div class="courseLabel">課程人數</div> <input id="maxPersons" class="courseInput" type="text" placeholder="請輸入課程人數"><br>
+
+      <div class="courseLabel">課程費用</div> <input id="fee" class="courseInput" type="text" placeholder="請輸入課程費用"><br>
+
+      <div class="courseLabel">其他說明</div> <input id="otherDesc" class="courseInput" type="text" placeholder="請輸入其他說明"><br>
+
+      <form id ="picUpload" class="couponLabel" style="width: 800px">       
+        <label for="file-upload" class="custom-file-upload">
+            選擇圖片
+        </label>
+        <input id="file-upload" type="file" name="file" onchange="readURL(this);">  
+        
+        <label class="custom-file-upload" onclick="uploadToCloudinary()">
+          上傳
+        </label> 
+        
+        <span id="上傳訊息" style="margin-left:20px; color:gray">圖片尚未選擇</span>
+      </form> 
+      <p style="margin: -3px 20px">** 為避免變形，圖片盡量接近方形</p>      
+      <img id="上傳課程圖片" src="#" alt="" style="margin-left: 20px; margin-top: 10px;" /> 
+           
+      <br><br>     
+      <br>
+      <button class="btn-blue" onclick="courseConfirm()">確定</button>
+      <button class="btn-red" onclick="courseCancel()">取消</button>
+      <span style="margin-left: 190px">重複</span>
+      <input id="repeatN" class="courseInput" style="width: 50px; text-align: right; padding-right: 10px;" type="text" value="1" placeholder="重複幾週">
+      週
+      <br>
+    </div>       
+  </div>
+  <!--  **** 新增課程的畫面:結束 **** -->
+  
+  <!--  **** 教練管理的畫面，目前沒有刪除教練的按鈕 **** -->
+  <div id="coachTable" style="font-size: 20px;font-family:'Noto Sans TC'" >
+    <div style="margin-left:20px;width:600px; heigth=200px;">
+      <button class="btn-blue" onclick="goToAddCoach()">新增老師</button>
+      <button class="btn-red" onclick="backToAddCourse()">退回</button>
+      <br>
+      點選老師，或是點擊 <b>新增老師</b> 來加入新老師
+      <table id="coachList" class="display" style="width:100%;">
+        <thead>
+          <tr id="coachList-header">
+            <th style="width: 160px;">老師姓名</th>
+            <th style="width: 40px">姓別</th>
+            <th>其他說明</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div> 
+  <!--  **** 教練管理的畫面:結束 **** -->   
+  
+  <!--  **** 新增教練的表格 **** -->
+  <div id="newCoachInfo" style="height: 600px; font-family:'Noto Sans TC'">
+    <h2 value="00">新增老師</h2>
+    <div style="font-size: 20px;">
+      <div class="courseLabel">老師姓名</div> <input id="newCoachName" class="courseInput" type="text" placeholder="請輸入老師姓名"><br>     
+      <div class="courseLabel">性別</div>   
+        <select id="newCoachGender" class="courseInput" name="coachGender" style="width: 413px;height: 38px">
+          <option value="男">男</option>
+          <option value="女">女</option>
+          <option value="其他">其他</option>
+          <option value="不透漏">不透漏</option>          
+        </select><br>
+
+      <div class="courseLabel">其他說明</div> <input id="newCoachOthers" class="courseInput" type="text" placeholder="請輸入其他說明"><br
+
+      <br>
+      <button class="btn-blue" onclick="addCoachInfo()">確定</button>
+      <button class="btn-red" onclick="backToAddCourse()">取消</button>
+    </div>       
+  </div>  
+  <!--  **** 新增教練的表格:結束 **** -->
+
+  <!--  **** 課程細節的畫面，可以更新課程資料，繳費及簽到 **** -->
+  <div id="courseDetail" style="font-family:'Noto Sans TC'">
+    <button class="btn-blue" onclick="backToHome()" style="float: left"><i class="fa fa-arrow-left"></i>&nbsp 回到 課程管理</button>
+    <h2 id="courseNumberDetail" style="margin-left: 200px" value="00">簽到頁面</h2>
+    <div style="font-size: 20px;"><br>
+      <div class="courseLabelDetail">課程名稱</div> <input id="courseNameDetail" class="courseInputDetail" type="text" placeholder="請輸入課程名稱"><br>
+
+      <div class="courseLabelDetail">老師姓名</div> <input id="coachNameDetail" class="courseInputDetail" type="text" placeholder="請輸入老師姓名"><br>
+
+      <div class="courseLabelDetail">助教姓名</div> <input id="assistNameDetail" class="courseInputDetail" type="text" placeholder="請輸入助教姓名"><br>
+
+      <div class="courseLabelDetail">上課時間</div> <input id="courseTimeDetail" class="courseInputDetail" type="text"><br>
+
+      <div class="courseLabelDetail">燃燒熱量</div> <input id="CaloriesDetail" class="courseInputDetail" type="text" placeholder="上課會燃燒的卡路里"><br>
+
+      <div class="courseLabelDetail">課程人數</div> <input id="maxPersonsDetail" class="courseInputDetail" type="text" placeholder="請輸入課程人數"><br>
+
+      <div class="courseLabelDetail">課程費用</div> <input id="feeDetail" class="courseInputDetail" type="text" placeholder="請輸入課程費用"><br>
+
+      <div class="courseLabelDetail">其他說明</div> <input id="otherDescDetail" class="courseInputDetail" type="text" placeholder="請輸入其他說明"><br>
+
+      <img id="課程圖片" src="" alt="" style="margin-left:20px">
+      
+      <form id ="picUpdate" class="couponLabel" style="width: 100%;margin-bottom:20px">       
+        <label for="file-update" class="custom-file-upload">
+            選擇圖片
+        </label>
+        <input id="file-update" type="file" name="file" onchange="readURL_detail(this);">  
+        
+        <label class="custom-file-upload" onclick="updateToCloudinary()">
+          上傳
+        </label> 
+
+        <span id="上傳訊息-詳細" style="margin-left:20px; color:gray"></span>        
+      </form>
+      <p style="margin: -15px 20px">** 為避免變形，圖片盡量接近方形</p>       
+      <br>           
+      <br>
+      
+      <button class="btn-blue" onclick="backToHome()"><i class="fa fa-arrow-left"></i>&nbsp 回到 課程管理</button>
+      <button class="btn-red" onclick="courseUpdate()">更新 課程資料</button>
+      <br>
+     
+      <table id="courseMemberTable" class="display" style="width:100%;font-family:'Noto Sans TC'; margin-left:20px">
+        <thead>
+          <tr id="table-header">
+            <th style="">姓名</th>
+<!--
+            <th style="width: 100px">LINE ID</th>
+            <th style="width: 50px">電話</th>
+            <th style="width: 100px">身分證號</th>
+            <th>地址</th>
+-->
+            <th style="width: 50px">繳費</th>
+            <th style="width: 50px">簽到</th>
+            <th style="width: 150px">操作</th>
+          </tr>
+        </thead>
+      </table>
+    </div> 
+  </div>    
+  <!--  **** 課程細節的畫面:結束 **** -->
+  
+  <!--  **** 以上 HTML 畫面設計結束，但 datatables 必須靠 js/main-page.js 來完成。以下是 Javascript codes **** -->
+     
+  <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.2/firebase-app.js"></script>
+
+  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  <!--  analytic 功能先不用-->
+  <!--  <script src="https://www.gstatic.com/firebasejs/7.5.2/firebase-analytics.js"></script>-->
+
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/7.5.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.5.2/firebase-database.js"></script>
+  
+  <!--  firestore 功能先不用-->
+  <!--  <script src="https://www.gstatic.com/firebasejs/7.5.2/firebase-firestore.js"></script>-->
+
+
+  <!-- 我們的 Firebase Operations 放在 js/firebase-ops.js -->
+  <script src="js/firebase-ops.js"></script>
+
+  <script>
+    //   資料格式
+    //    var memberData= [
+    //      ["小陳", "男", "1966-01-01", "09XXXXX111", "A1XXXXXAAA", "台北市", "U001"],
+    //      ["小白", "女", "1966-02-02", "09XXXXX222", "A1XXXXXBBB", "竹北市", "U002"],   
+    //      ["小華", "男", "1966-03-03", "09XXXXX333", "A1XXXXXCCC", "新竹市", "U003"],
+    //      ["小陳", "男", "1976-01-01", "09XXXXX444", "A1XXXXXDDD", "台北市", "U004"],   
+    //    ];
+    //
+    //    var courseMember =[
+    //      ["U0001", ["小陳", "已繳費", "已簽到", "U001", "09XXXXX111"], ["小白", "未繳費", "未簽到", "U002", "09XXXXX222"]],
+    //      ["U0002", ["小白", "已繳費", "未簽到", "U002", "09XXXXX222"], ["小陳", "已繳費", "未簽到", "U001", "09XXXXX111"]],   
+    //      ["U0003", ["小華", "未繳費", "未簽到", "U003", "09XXXXX333"], ["小陳", "已繳費", "未簽到", "U001", "09XXXXX111"]],           
+    //    ];
+    //
+    //    var courseMemberSet = [
+    //      ["小陳", "09XXXXX111", "台北市", "未繳費", "未簽到"],
+    //    ];
+    //
+    //    [ID, Name, Coach, date/time, Calories, Fee, Max.Persons, 已報名人數, 已繳費人數, Assist, OtherDesc]
+    //    var courseData = [
+    //      ["U0002", "TEST #2", "測試 老師 #2", "2019-01-13 18:00", "200", "120", "20", "10", "10",
+    //        "alice", ""
+    //      ],
+    //    ];
+    //
+    //    var courseHistory = [
+    //      ["U0001", "TEST #1", "測試 老師 #1", "2020-01-09 18:30", "100", "100", "10", "10", "10"
+    //        "", ""
+    //      ],
+    //    ];    
+    //    var coachSet = [
+    //      ["Jack", "男", "高大帥"],
+    //      ["Chantal", "女", "愛跑馬拉松"],
+    //    ];  
+    
+    // 全域變數，偷懶用，容易產生麻煩的 bugs
+    var courseData = [];
+    var courseHistory = [];
+    var courseMemberSet = [];
+    var coachSet = [];
+    var memberData = [];
+    var courseForDetail;
+
+    // picture URL reurn from Cloudinary in onSuccess()
+    var securePicUrl="";
+    
+    // 從 Firebase 資料庫取得 courseData, courseHistory, , courseMember, coachSet, 
+    // 定義在 js/firebase-ops.js 中
+    readFromDB();
+
+  </script>      
+
+  <!-- Main page init，初始化 datatables-->
+  <script src="js/main-page.js"></script>
+
+  <!-- 我們的 Functions-->
+  <script src="js/functions.js"></script>      
+
+  <!--  **** MAIN ***-->
+  <script type="text/javascript">
+    var courseNum = 0; // Update from Database
+    var inAddCourse = false;
+    var version = " V2";
+
+//    $("#titleHeader").text("三峽運動中心 - 團體課程管理"+version);
+    $("#titleHeader").text("團體課程管理"+version);    
+
+
+    $(document).ready(function() {
+      initMainPage(); // 在 js/main-page.js  
+
+    });
+  </script>
+
+
+    <script>        
+      // ========= 以下為方便  debug 的函式
+
+      var i = 0;
+
+      function myFunctionA() {
+        firebase.auth().signInWithEmailAndPassword("aaa@test.com", "aaaaaa").catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          document.getElementById("loader").innerHTML = "Login Error";
+        });
+      }
+
+      function myFunctionB() {
+        firebase.auth().signInWithEmailAndPassword("bbb@test.com", "bbbbbb").catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          document.getElementById("loader").innerHTML = "Login Error";
+        });
+      }
+
+      function myFunction() {
+//          var user = firebase.auth().currentUser;
+//          console.log(user.uid);
+
+      }
+
+      function myFunctionSignOut() {
+        firebase.auth().signOut();
+        console.log("logout");
+      }
+
+      function myFunctionR() {
+        console.log("Read Database");
+
+        //var userId = firebase.auth().currentUser.uid;
+
+        //          var aaa = firebase.database().ref('users/三峽運動中心/'+userId+'/團課課程').once('value').then(function(snapshot) {
+        var aaa = firebase.database().ref('users/三峽運動中心/團課課程/').once('value').then(function(snapshot) {
+          console.log("done");
+          var bbb = snapshot.val();
+          console.log(bbb);
+          console.log(JSON.parse(bbb.現在課程));
+          courseData = JSON.parse(bbb.現在課程);
+        });
+
+      }
+
+
+      function myFunctionW() {
+
+        try {
+          var userId = firebase.auth().currentUser.uid;
+        } catch (e) {
+          alert("Please login first!");
+          return 0;
+        }
+
+        var courseHistory = [
+          ["U0001", "TEST #1", "測試 老師 #1", "2020-01-09 18:30", "100", "100", "10", "10", "10",
+            "", ""
+          ],
+        ];        
+        
+        database.ref('users/三峽運動中心/團課課程').set({
+          現在課程: JSON.stringify(courseData),
+          過去課程: JSON.stringify(courseHistory),
+        }, function(error){
+             if (error) {
+               //console.log(error);
+               return 0;
+             }
+               console.log('Write to database successful');
+        });
+
+          
+//           database.ref('users/三峽運動中心/教練管理').set({
+//            老師資料: JSON.stringify(coachSet),  
+//           });
+
+
+//        var  memberData= [    
+//          ["小陳", "男", "1966-01-01", "09XXXXX111", "A1XXXXXAAA", "台北市", "U001"],
+//          ["小白", "女", "1966-02-02", "09XXXXX222", "A1XXXXXBBB", "竹北市", "U002"],   
+//          ["小華", "男", "1966-03-03", "09XXXXX333", "A1XXXXXCCC", "新竹市", "U003"],
+//          ["小陳", "男", "1976-01-01", "09XXXXX444", "A1XXXXXDDD", "台北市", "U004"],              
+//        ];
+//        database.ref('users/三峽運動中心/客戶管理').set({
+//          會員資料: JSON.stringify(memberData),
+//
+//        });
+//          
+//        var courseMember =[
+//          ["U0001", ["小陳", "已繳費", "已簽到", "U001", "09XXXXX111"], ["小白", "未繳費", "未簽到", "U002", "09XXXXX222"]],
+//          ["U0002", ["小白", "已繳費", "未簽到", "U002", "09XXXXX222"], ["小陳", "已繳費", "未簽到", "U001", "09XXXXX111"]],   
+//          ["U0003", ["小華", "未繳費", "未簽到", "U003", "09XXXXX333"], ["小陳", "已繳費", "未簽到", "U001", "09XXXXX111"]],           
+//        ];          
+//
+//        database.ref('users/三峽運動中心/課程管理').set({
+//          課程會員: JSON.stringify(courseMember),
+//
+//        });
+
+
+        i++;
+
+      }
+
+      function aaaFunction() {
+        console.log("aaa");
+        //$("#centerCell").css('background-color', 'red');
+        $("#aaa").css({
+          "background-color": "yellow",
+          "font-size": "200%"
+        });
+        $("#aaa").html('Save');
+      }
+
+
+
+      function cccFunction() {
+        console.log("ccc");
+
+        $("#courseTable").hide();
+        $("#addCourse").show();
+      }
+    </script>
+
+</body>
+
+</html>
