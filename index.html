@@ -136,8 +136,10 @@
 
       <div class="courseLabel">上課時間</div> 
       <span>
-        <input id="courseDate" class="courseInput" type="date" style="width: 180px"> 
-        <input id="courseTime" class="courseInput"type="text"  style="width: 200px; height: 28px; margin-left: -10px" placeholder="例如:18:30~19:30">
+        <input id="courseDate" class="courseInput" type="date" style="width: 180px">   從
+<!--        <input id="courseTime" class="courseInput"type="text"  style="width: 200px; height: 28px; margin-left: -10px" placeholder="例如:18:30~19:30">-->
+        <input id="courseStartTime" class="courseInput" type="time" style="width: 150px" value="18:30">到
+        <input id="courseEndTime"   class="courseInput" type="time" style="width: 150px" value="19:30">
       </span>
       <br>   
 
@@ -229,7 +231,11 @@
 
       <div class="courseLabelDetail">助教姓名</div> <input id="assistNameDetail" class="courseInputDetail" type="text" placeholder="請輸入助教姓名"><br>
 
-      <div class="courseLabelDetail">上課時間</div> <input id="courseTimeDetail" class="courseInputDetail" type="text"><br>
+      <div class="courseLabelDetail">上課時間</div> <input id="courseDateDetail" class="courseInputDetail" style="width: 150px" type="date">
+      <span style="font-size:16px">從</span>
+      <input id="courseStartTimeDetail" class="courseInputDetail" type="time" style="width: 150px" value="18:30">
+      <span style="font-size:16px">到</span>
+      <input id="courseEndTimeDetail"   class="courseInputDetail" type="time" style="width: 150px" value="19:30"><br>
 
       <div class="courseLabelDetail">燃燒熱量</div> <input id="CaloriesDetail" class="courseInputDetail" type="text" placeholder="上課會燃燒的卡路里"><br>
 
