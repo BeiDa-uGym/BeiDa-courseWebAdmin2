@@ -197,11 +197,22 @@ function initMainPage() {
     $("#courseNumberDetail").text("簽到頁面 - " + data[0] + " "+ data[1] + " @" + data[3]);
     
     courseForDetail = data[0];
-
+    
+    var dateAndTimeArray = data[3].split(" ");
+    var dateArray = dateAndTimeArray[0].split("-");
+    if (dateArray[1].length==1) dateArray[1]= "0"+dateArray[1];
+    if (dateArray[2].length==1) dateArray[2]= "0"+dateArray[2];
+    var dateStr = dateArray[0]+ "-" + dateArray[1] + "-" + dateArray[2];
+    
+    [startTimeStr, endTimeStr] = dateAndTimeArray[1].split("~");
+    console.log(startTimeStr, endTimeStr);
+    
     $("#courseNameDetail").val(data[1]);
     $("#coachNameDetail").val(data[2]);
     $("#assistNameDetail").val(data[9]);
-    $("#courseTimeDetail").val(data[3]);
+    $("#courseDateDetail").val(dateStr);     
+    $("#courseStartTimeDetail").val(startTimeStr);
+    $("#courseEndTimeDetail").val(endTimeStr);   
     $("#CaloriesDetail").val(data[4]);
     $("#maxPersonsDetail").val(data[6]);
     $("#feeDetail").val(data[5]);
@@ -209,7 +220,7 @@ function initMainPage() {
     
     $("#課程圖片")
       .attr('src', data[11])
-      .width(520)
+      .width(620)
       //.height(200);
 
     courseMember.forEach(function (item, index, array) {

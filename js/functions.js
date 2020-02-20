@@ -51,11 +51,13 @@ function courseConfirm() {
     var courseNameTmp;
     courseNameTmp = (repeatTimes>1)? $("#courseName").val()+" ("+(i+1)+")":$("#courseName").val();
     
+    var coursePeriod = $("#courseStartTime").val()+"~"+$("#courseEndTime").val();
+    //console.log(coursePeriod);
     var dataToAdd = [
               "U" + zeroFill(courseNum, 4),
               courseNameTmp,
               $("#coachName").val(),
-              nextDateStr + " " + $("#courseTime").val(),
+              nextDateStr + " " + coursePeriod,
               $("#Calories").val(),
               $("#fee").val(),      
               $("#maxPersons").val(),
@@ -203,7 +205,7 @@ function courseUpdate() {
           courseForDetail,
           $("#courseNameDetail").val(),
           $("#coachNameDetail").val(),
-          $("#courseTimeDetail").val(),
+          $("#courseDateDetail").val(),
           $("#CaloriesDetail").val(),
           $("#feeDetail").val(),          
           $("#maxPersonsDetail").val(),
@@ -516,7 +518,7 @@ function readURL(input) {
       console.log("aaa");
       $('#上傳課程圖片')
         .attr('src', e.target.result)
-        .width(520)
+        .width(720)
         //.height(200);
       
       $("#上傳訊息").text("圖片尚未上傳");
