@@ -200,12 +200,22 @@ function courseUpdate() {
     // TODO: 尋找 courseData 這筆資料，並取代
     for (var i =0; i< courseData.length; i++){
       //console.log(courseData[i][0]);
+      
+      //修正日期的討厭問題 2020-02-06 ==> 2020-2-6
+      var dateTemp = $("#courseDateDetail").val();
+      var dateArray = dateTemp.split("-");
+      if (dateArray[1][0]=="0") dateArray[1] = dateArray[1][1];
+      if (dateArray[2][0]=="0") dateArray[2] = dateArray[2][1]; 
+      dateTemp=dateArray[0]+"-"+dateArray[1]+"-"+dateArray[2];
+      console.log("aaa", dateTemp);
+      //End:修正日期的討厭問題
+      
       if (courseData[i][0]==courseForDetail) {
         var dataToReplace = [ 
           courseForDetail,
           $("#courseNameDetail").val(),
           $("#coachNameDetail").val(),
-          $("#courseDateDetail").val(),
+          dateTemp+" "+$("#courseStartTimeDetail").val()+"~"+$("#courseEndTimeDetail").val(),
           $("#CaloriesDetail").val(),
           $("#feeDetail").val(),          
           $("#maxPersonsDetail").val(),
