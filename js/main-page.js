@@ -222,6 +222,7 @@ function initMainPage() {
       .attr('src', data[11])
       .width(620)
       //.height(200);
+    securePicUrl = data[11];
 
     courseMember.forEach(function (item, index, array) {
       if (item[0] == data[0]) {
