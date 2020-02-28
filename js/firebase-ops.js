@@ -1,6 +1,14 @@
 // Cloudinary post URL
-var cloudinaryPostUrl = "https://api.cloudinary.com/v1_1/beida-ugym/image/upload";
-var presetName = "llftctau"
+//var cloudinaryPostUrl = "https://api.cloudinary.com/v1_1/beida-ugym/image/upload";
+//var presetName = "llftctau"
+
+// 改為 Cloudinary beida-coupon 帳號
+//var cloudinaryPostUrl = "https://api.cloudinary.com/v1_1/beida-coupon/image/upload";
+//var presetName = "ntb4ppf4"
+
+// 改為使用 Imgur BeiDa-Coupon 帳號
+var bearerId = "Bearer 5130399359e4fe9be958edd10450a8763df34277";
+var clientId = "Client-ID e113d4b4cf3d463";
 
 // Your web app's Firebase configuration
 var firebaseConfig = {

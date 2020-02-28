@@ -628,3 +628,109 @@ function updateToCloudinary() {
   xhr.open("post", cloudinaryPostUrl);
   xhr.send(dataToSend);  
 }
+
+//======= Using Imgur ==============
+function uploadToImgur() {
+  console.log("upload file to Imgur");
+  
+  var 需要上傳 = ($("#上傳訊息").text() == "圖片尚未上傳" );
+
+  if ( !需要上傳 ){
+    alert("圖片尚未選擇或圖片已上傳");
+    return 0;
+  }
+  
+  $("#上傳訊息").text("圖片上傳中 ...");
+  
+
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", bearerId);
+  //myHeaders.append("Authorization", clientId);
+
+  var selectedFile=$("#file-upload").get(0).files;
+  console.log(selectedFile[0].size); // 可以查看檔案大小
+
+
+  var formdata = new FormData();
+  formdata.append("image", selectedFile[0]);
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: formdata,
+    redirect: 'follow'
+  };
+
+  fetch("https://api.imgur.com/3/image", requestOptions)
+  .then(response => response.text())
+  .then(result => {
+    var returnObj = JSON.parse(result);
+    console.log(returnObj.data.link);
+
+    securePicUrl = returnObj.data.link;
+
+    if ( securePicUrl != undefined) {
+      console.log("Success", securePicUrl);
+      if ($("#上傳訊息").text() == "圖片上傳中 ...") $("#上傳訊息").text("圖片上傳成功");
+      if ($("#上傳訊息-詳細").text() == "圖片上傳中 ...") $("#上傳訊息-詳細").text("圖片上傳成功");
+    } else {
+      alert("圖片上傳失敗");
+      if ($("#上傳訊息").text() == "圖片上傳中 ...") $("#上傳訊息").text("圖片上傳失敗");
+      if ($("#上傳訊息-詳細").text() == "圖片上傳中 ...") $("#上傳訊息-詳細").text("圖片上傳失敗");    
+    }    
+  })
+  .catch(error => console.log('Upload to Imgur error', error));
+  
+}
+
+function updateToImgur() {
+  console.log("update file to Imgur");
+  
+  var 需要上傳 = ($("#上傳訊息-詳細").text() == "圖片尚未上傳" );
+
+  if ( !需要上傳 ){
+    alert("圖片尚未選擇或圖片已上傳");
+    return 0;
+  }
+  
+  $("#上傳訊息-詳細").text("圖片上傳中 ...");
+
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", bearerId);
+  //myHeaders.append("Authorization", clientId);
+
+  var selectedFile=$("#file-update").get(0).files;
+  console.log(selectedFile[0].size); // 可以查看檔案大小
+
+
+  var formdata = new FormData();
+  formdata.append("image", selectedFile[0]);
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: formdata,
+    redirect: 'follow'
+  };
+
+  fetch("https://api.imgur.com/3/image", requestOptions)
+  .then(response => response.text())
+  .then(result => {
+    var returnObj = JSON.parse(result);
+    console.log(returnObj.data.link);
+
+    securePicUrl = returnObj.data.link;
+
+    if ( securePicUrl != undefined) {
+      console.log("Success", securePicUrl);
+      if ($("#上傳訊息").text() == "圖片上傳中 ...") $("#上傳訊息").text("圖片上傳成功");
+      if ($("#上傳訊息-詳細").text() == "圖片上傳中 ...") $("#上傳訊息-詳細").text("圖片上傳成功");
+    } else {
+      alert("圖片上傳失敗");
+      if ($("#上傳訊息").text() == "圖片上傳中 ...") $("#上傳訊息").text("圖片上傳失敗");
+      if ($("#上傳訊息-詳細").text() == "圖片上傳中 ...") $("#上傳訊息-詳細").text("圖片上傳失敗");    
+    }    
+  })
+  .catch(error => console.log('Upload to Imgur error', error));
+  
+}
