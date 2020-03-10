@@ -594,9 +594,23 @@ function initMainPage() {
       };
     }   
     
+    function 檢查課程是否免費(課程編號){
+      var 免費課程 = false;
+      courseData.forEach(function(course, index, array){
+        if (course[0]==課程編號) {
+          if ( course[5]=="免費" ||  course[5]=="0" ) {
+            免費課程 = true;
+            return; // 只跳出迴圈
+          }
+        }        
+      });   
+
+      return 免費課程;
+    } 
+    
     //console.log(courseMember[thisIndex][thisI][0],courseMember[thisIndex][thisI][1]);
     var 繳費狀況;
-    if (檢查課程是否免費(courseId)) {
+    if (檢查課程是否免費(courseForDetail)) {
       繳費狀況 = "免費";
     } else {
       繳費狀況 = "未繳費";
@@ -607,7 +621,7 @@ function initMainPage() {
     // Update courseMemberSet 及其 Table  
     for (var i=0; i< courseMemberSet.length; i++){
       //console.log(courseMemberSet[i][0], data[0]);
-      if (courseMemberSet[i][1] == data[1]) {
+      if (courseMemberSet[i][0] == data[0]) {
         //console.log("match");
         courseMemberSet[i][1] = 繳費狀況;
         courseMemberSet[i][2] = "未簽到";
