@@ -595,7 +595,13 @@ function initMainPage() {
     }   
     
     //console.log(courseMember[thisIndex][thisI][0],courseMember[thisIndex][thisI][1]);
-    courseMember[thisIndex][thisI][1] = "未繳費";
+    var 繳費狀況;
+    if (檢查課程是否免費(courseId)) {
+      繳費狀況 = "免費";
+    } else {
+      繳費狀況 = "未繳費";
+    }
+    courseMember[thisIndex][thisI][1] = 繳費狀況;
     courseMember[thisIndex][thisI][2] = "未簽到";
 
     // Update courseMemberSet 及其 Table  
@@ -603,7 +609,7 @@ function initMainPage() {
       //console.log(courseMemberSet[i][0], data[0]);
       if (courseMemberSet[i][1] == data[1]) {
         //console.log("match");
-        courseMemberSet[i][1] = "未繳費";
+        courseMemberSet[i][1] = 繳費狀況;
         courseMemberSet[i][2] = "未簽到";
       };
     };
