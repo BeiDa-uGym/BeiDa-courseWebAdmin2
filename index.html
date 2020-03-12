@@ -70,6 +70,22 @@
 <!--    <h1 id="titleHeader">三峽運動中心 - 團體課程管理</h1>-->
     <h1 id="titleHeader">團體課程管理</h1> 
   </div>
+  
+  <div style="font-family:'Noto Sans TC';">
+    <form id ="上傳課表圖片Form" class="couponLabel" style="width: 800px">       
+      <label for="課表檔案" class="custom-file-upload">
+          選擇課表圖片
+      </label>
+      <input id="課表檔案" type="file" name="file" onchange="readURL_課表(this);">  
+      <label class="custom-file-upload" onclick="上傳課表ToImgur()">
+        上傳課表圖片 
+      </label> 
+
+      <span id="上傳課表訊息" style="margin-left:20px; color:gray">課表圖片尚未選擇</span>
+    </form>    
+    <img id="上傳課表圖片" src="#" alt="" style="margin-left: 20px; margin-top: 10px;" />   
+  </div>
+  
   <hr>
   <!--  **** 標頭:結束 ****-->
   
@@ -356,6 +372,7 @@
 
     // picture URL reurn from Cloudinary in onSuccess()
     var securePicUrl="";
+    var 課程PicUrl="";    
     
     // 從 Firebase 資料庫取得 courseData, courseHistory, , courseMember, coachSet, 
     // 定義在 js/firebase-ops.js 中

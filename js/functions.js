@@ -518,7 +518,27 @@ function 更新課程報名繳費人數(課程編號, 修改資料, 修改數量
   });     
 }
 
-// functions for Cloudinary
+function readURL_課表(input) {
+  console.log("readURL_課表");
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+
+    reader.onload = function (e) {
+      console.log("ccc");
+      $("#上傳課表圖片").show();
+      $('#上傳課表圖片')
+        .attr('src', e.target.result)
+        .width(750)
+        //.height(200);
+      
+      $("#上傳課表訊息").text("課表圖片尚未上傳");
+      課表PicUrl ="";
+    };
+
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
 function readURL(input) {
   console.log("readURL");
   if (input.files && input.files[0]) {
@@ -630,6 +650,73 @@ function updateToCloudinary() {
 }
 
 //======= Using Imgur ==============
+function 上傳課表ToImgur() {
+  console.log("上傳課表 to Imgur");
+  
+  var 需要上傳 = ($("#上傳課表訊息").text() == "課表圖片尚未上傳" );
+
+  if ( !需要上傳 ){
+    alert("課程圖片尚未選擇或圖片已上傳");
+    return 0;
+  }
+  
+  $("#上傳課表訊息").text("課表圖片上傳中 ...");
+  
+
+  var myHeaders = new Headers();
+  myHeaders.append("Authorization", bearerId);
+  //myHeaders.append("Authorization", clientId);
+
+  var selectedFile=$("#課表檔案").get(0).files;
+  console.log(selectedFile[0].size); // 可以查看檔案大小
+
+
+  var formdata = new FormData();
+  formdata.append("image", selectedFile[0]);
+
+  var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: formdata,
+    redirect: 'follow'
+  };
+
+  fetch("https://api.imgur.com/3/image", requestOptions)
+  .then(response => response.text())
+  .then(result => {
+    var returnObj = JSON.parse(result);
+
+    課程PicUrl = returnObj.data.link;
+    console.log(課程PicUrl);
+
+    if ( 課程PicUrl != undefined) {
+      console.log("Success", 課程PicUrl);
+      if ($("#上傳課表訊息").text() == "課表圖片上傳中 ...") $("#上傳課表訊息").text("課表圖片上傳成功");
+    } else {
+      alert("圖片上傳失敗");
+      if ($("#上傳課表訊息").text() == "課表圖片上傳中 ...") $("#上傳課表訊息").text("課表圖片上傳失敗");
+    }    
+
+    // 課程寫入資料庫
+    database.ref('users/三峽運動中心團課課表').set({
+      課程PicUrl: JSON.stringify(課程PicUrl),
+    }, function (error) {
+      if (error) {
+        console.log("Write to database error, revert courseData back");
+        $("#上傳課表圖片").hide()
+      } else {
+        console.log('Write to database successful');
+        $("#上傳課表圖片").hide();     
+      }
+    });
+    
+  })
+  .catch(function(error) {
+    console.log('Upload to Imgur error', error);
+    $("#上傳課表圖片").hide();
+  });  
+}
+
 function uploadToImgur() {
   console.log("upload file to Imgur");
   
