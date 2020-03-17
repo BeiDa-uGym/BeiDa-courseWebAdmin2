@@ -71,15 +71,13 @@ function readFromDB() {
   console.log("Read Database");
 
   $.loading.start('Loading data');
-
-  var toRead = 4;
-  var readTimes = 0;
-  firebase.database().ref('users/三峽運動中心/團課課程').once('value').then(function (snapshot) {
+  // 一次全讀
+  firebase.database().ref('users/三峽運動中心').once('value').then(function (snapshot) {
     console.log("data read done");
-    readTimes++;
+    //readTimes++;
     var result = snapshot.val();
-    courseData = JSON.parse(result.現在課程);
-    courseHistory = JSON.parse(result.過去課程);
+    courseData = JSON.parse(result.團課課程.現在課程);
+    courseHistory = JSON.parse(result.團課課程.過去課程);
 
     if (courseData.length>0) {
       var tmp1 = courseData[courseData.length - 1][0];
@@ -96,36 +94,69 @@ function readFromDB() {
     //console.log(courseNum);
 
     refreshCourse();
-
-    if (readTimes == toRead) $.loading.end();
-  });
-
-  firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function (snapshot) {
-    console.log("member read done");
-    readTimes++;
-    var result = snapshot.val();
-    memberData = JSON.parse(result.會員資料);
-
-    if (readTimes == toRead) $.loading.end();
-  });
-
-  firebase.database().ref('users/三峽運動中心/課程管理').once('value').then(function (snapshot) {
-    console.log("class read done");
-    readTimes++;
-    var result = snapshot.val();
-    courseMember = JSON.parse(result.課程會員);
-
-    if (readTimes == toRead) $.loading.end();
-  });
-  
-  firebase.database().ref('users/三峽運動中心/教練管理').once('value').then(function (snapshot) {
-    console.log("Coach read done");
-    readTimes++;
-    var result = snapshot.val();
-    coachSet = JSON.parse(result.老師資料);
-
-    if (readTimes == toRead) $.loading.end();
+    
+    memberData   = JSON.parse(result.客戶管理.會員資料);   
+    courseMember = JSON.parse(result.課程管理.課程會員);    
+    coachSet     = JSON.parse(result.教練管理.老師資料);
+    
+    $.loading.end();
   });  
+  
+// 分 4 次讀，比較慢也比較出問題
+//  var toRead = 4;
+//  var readTimes = 0;
+//  firebase.database().ref('users/三峽運動中心/團課課程').once('value').then(function (snapshot) {
+//    console.log("data read done");
+//    readTimes++;
+//    var result = snapshot.val();
+//    courseData = JSON.parse(result.現在課程);
+//    courseHistory = JSON.parse(result.過去課程);
+//
+//    if (courseData.length>0) {
+//      var tmp1 = courseData[courseData.length - 1][0];
+//      var tmp2 = parseInt(tmp1.substr(1, 4));
+//    } else tmp2 = 0;
+//
+//    if (courseHistory.length>0) {    
+//      var tmp3 = courseHistory[courseHistory.length - 1][0];
+//      var tmp4 = parseInt(tmp3.substr(1, 4));  
+//    } else tmp4 = 0;
+// 
+//    courseNum = (tmp4 > tmp2)? tmp4:tmp2;
+//    
+//    //console.log(courseNum);
+//
+//    refreshCourse();
+//
+//    if (readTimes == toRead) $.loading.end();
+//  });
+//
+//  firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function (snapshot) {
+//    console.log("member read done");
+//    readTimes++;
+//    var result = snapshot.val();
+//    memberData = JSON.parse(result.會員資料);
+//
+//    if (readTimes == toRead) $.loading.end();
+//  });
+//
+//  firebase.database().ref('users/三峽運動中心/課程管理').once('value').then(function (snapshot) {
+//    console.log("class read done");
+//    readTimes++;
+//    var result = snapshot.val();
+//    courseMember = JSON.parse(result.課程會員);
+//
+//    if (readTimes == toRead) $.loading.end();
+//  });
+//  
+//  firebase.database().ref('users/三峽運動中心/教練管理').once('value').then(function (snapshot) {
+//    console.log("Coach read done");
+//    readTimes++;
+//    var result = snapshot.val();
+//    coachSet = JSON.parse(result.老師資料);
+//
+//    if (readTimes == toRead) $.loading.end();
+//  });  
 
 }
 
