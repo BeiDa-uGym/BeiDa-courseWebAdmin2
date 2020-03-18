@@ -119,17 +119,27 @@ function initMainPage() {
       });
 
       // 更新 courseNum
-      if (courseData.length>0) {
-        var tmp1 = courseData[courseData.length - 1][0];
-        var tmp2 = parseInt(tmp1.substr(1, 4));
-      } else tmp2 = 0;
-
-      if (courseHistory.length>0) {    
-        var tmp3 = courseHistory[courseHistory.length - 1][0];
-        var tmp4 = parseInt(tmp3.substr(1, 4));  
-      } else tmp4 = 0;
-
-      courseNum = (tmp4 > tmp2)? tmp4:tmp2;
+//      if (courseData.length>0) {
+//        var tmp1 = courseData[courseData.length - 1][0];
+//        var tmp2 = parseInt(tmp1.substr(1, 4));
+//      } else tmp2 = 0;
+//
+//      if (courseHistory.length>0) {    
+//        var tmp3 = courseHistory[courseHistory.length - 1][0];
+//        var tmp4 = parseInt(tmp3.substr(1, 4));  
+//      } else tmp4 = 0;
+//      courseNum = (tmp4 > tmp2)? tmp4:tmp2;
+      
+      courseNum = 0;
+      courseData.forEach(function(course, index, array){
+         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+         if (課程號碼 > courseNum) courseNum = 課程號碼;
+      });
+      
+      courseHistory.forEach(function(course, index, array){
+         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+         if (課程號碼 > courseNum) courseNum = 課程號碼;
+      });      
 
       // 更新 database
       database.ref('users/三峽運動中心/團課課程').set({
