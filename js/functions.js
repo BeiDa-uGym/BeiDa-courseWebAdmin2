@@ -37,9 +37,12 @@ function courseConfirm() {
   }
 
   var startDate = new Date($("#courseDate").val());
-  var nextDate = new Date();
   //console.log(startDate);
+  
+  // BUG: 這樣會指向當月 var nextDate = new Date();
+  var nextDate  = new Date($("#courseDate").val());
   nextDate.setDate(startDate.getDate() - 7);
+  
   var repeatTimes=$("#repeatN").val();
   for (var i=0; i<repeatTimes; i++){
     courseNum++;
