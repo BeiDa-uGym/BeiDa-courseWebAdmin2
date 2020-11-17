@@ -167,24 +167,24 @@ function refreshCourse() {
 }
 
 function backToHome() {
-  console.log("Refresh Course");
+  console.log("BackToHome, no reload");
   
-  location.reload();
+  //location.reload();
 
-//  $("#courseDetail").hide();
-//
-//  $("#courseTable").show();
-//  $("#courseHistoryTable").show();
-//  $("#spacerBetweenTables").show();
-//
-//  $(".dataTables_filter").show();
-//  $(".dataTables_info").show();
-//  $('#courseTable_paginate').show();
-//  $('#courseHistoryTable_paginate').show();
-//  $("#addCourse").hide();
-//  $("#inProgress").show();
-//  $("#addCourseBtn").show();
-//  $("#refreshBtn").show();
+  $("#courseDetail").hide();
+
+  $("#courseTable").show();
+  $("#courseHistoryTable").show();
+  $("#spacerBetweenTables").show();
+
+  $(".dataTables_filter").show();
+  $(".dataTables_info").show();
+  $('#courseTable_paginate').show();
+  $('#courseHistoryTable_paginate').show();
+  $("#addCourse").hide();
+  $("#inProgress").show();
+  $("#addCourseBtn").show();
+  $("#refreshBtn").show();
 }
 
 function courseUpdate() {
