@@ -16,6 +16,7 @@
   <script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>  
 
   <link rel="stylesheet" href="css/loading.css" />
   <script src="js/loading.js"></script>
@@ -187,12 +188,16 @@
     var myCoursesHistory = [];
     var courseData = [];
     var courseHistory = [];
+    var courseMember =[];
     var notInCourses=[];
     var username;
     var userPhoneNumberforPayment;
     
     var userForAddingCourse;
     var userForCancelCourse;
+    
+    // Heroku apiURLbase
+    var apiUrlBase = "https://beida-api-for-firebase.herokuapp.com/";
 
     // Monitoring AuthState
     firebase.auth().onAuthStateChanged(function(user) {
@@ -212,63 +217,100 @@
         isLogin = true;
       }
     });
-
-    var readTimes = 0;
-    var toRead = 3;
-
-    firebase.database().ref('users/三峽運動中心/團課課程').once('value').then(function(snapshot) {
-      console.log("data read done");
-      readTimes++;
-      var result = snapshot.val();
-      courseData = JSON.parse(result.現在課程);
-      courseHistory = JSON.parse(result.過去課程);
-      buildCoursesTable();
-      if (readTimes == toRead) {
-        $.loading.end();
-      }
-    });
-
-    $.loading.start('Loading data');
-    firebase.database().ref('users/三峽運動中心/課程管理').once('value').then(function(snapshot) {
-      console.log("class read done");
-      readTimes++;
-      var result = snapshot.val();
-      courseMember = JSON.parse(result.課程會員);
-      if (readTimes == toRead) $.loading.end();
-    });
-
-    // Read memberData from the database
-    firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function(snapshot) {
-      console.log("member read done");
-      readTimes++;
-      var result = snapshot.val();
-      memberData = JSON.parse(result.會員資料);
-      
-      
-      // 轉換 userId，從 33字元長度 "Uaabb....ccdd" ==> 顯示 "Uaabb..ccdd"
-      //memberLineId=[];
-      //memberData.forEach(function(member, index, array){
-      //  memberLineId.push(member[1]);
-      //  var head, tail;
-      //  head=member[1].slice(0,5);
-      //  tail=member[1].slice(29,33)
-      //  console.log(head+".."+tail);
-      //  member[1]=head.toUpperCase()+".."+tail.toUpperCase();
-      //});
-      
-      buildMemberTable();      
-      if (readTimes == toRead) {
-        $.loading.end();
-      }
-    });
     
-    buildMyCoursesTable();
-    //buildCoursesTable();
-    $("#addMemberInfo").hide();
-    $("#myCourseDiv").hide();
-    $("#courseDiv").hide();    
+    readFromDB();
+     
 
     //======== Functions ===================//
+    async function readFromDB(){
+      //改用 Heroku API
+      $.loading.start('Loading data');
+      var apiUrl = apiUrlBase + "?API=10";
+      console.log("Reading courseData");
+      await axios.get(apiUrl).then(function (response) {
+        courseData=response.data;
+      });
+      console.log("courseData is read");
+
+      var apiUrl = apiUrlBase + "?API=11";
+      console.log("Reading courseHistory");
+      await axios.get(apiUrl).then(function (response) {
+        courseHistory=response.data;
+      });
+      console.log("courseHistory is read");  
+
+      var apiUrl = apiUrlBase + "?API=12";
+      console.log("Reading courseMember");
+      await axios.get(apiUrl).then(function (response) {
+        courseMember=response.data;
+      });
+      console.log("courseMember is read");   
+
+      var apiUrl = apiUrlBase + "?API=16";
+      console.log("Reading memberData");
+      await axios.get(apiUrl).then(function (response) {
+        memberData=response.data;
+      });
+      console.log("memberData is read");  
+      $.loading.end();
+
+      buildCoursesTable();
+      buildMemberTable();
+  //    var readTimes = 0;
+  //    var toRead = 3;
+
+  //    firebase.database().ref('users/三峽運動中心/團課課程').once('value').then(function(snapshot) {
+  //      console.log("data read done");
+  //      readTimes++;
+  //      var result = snapshot.val();
+  //      courseData = JSON.parse(result.現在課程);
+  //      courseHistory = JSON.parse(result.過去課程);
+  //      buildCoursesTable();
+  //      if (readTimes == toRead) {
+  //        $.loading.end();
+  //      }
+  //    });
+  //
+  //    $.loading.start('Loading data');
+  //    firebase.database().ref('users/三峽運動中心/課程管理').once('value').then(function(snapshot) {
+  //      console.log("class read done");
+  //      readTimes++;
+  //      var result = snapshot.val();
+  //      courseMember = JSON.parse(result.課程會員);
+  //      if (readTimes == toRead) $.loading.end();
+  //    });
+  //
+  //    // Read memberData from the database
+  //    firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function(snapshot) {
+  //      console.log("member read done");
+  //      readTimes++;
+  //      var result = snapshot.val();
+  //      memberData = JSON.parse(result.會員資料);
+  //      
+  //      
+  //      // 轉換 userId，從 33字元長度 "Uaabb....ccdd" ==> 顯示 "Uaabb..ccdd"
+  //      //memberLineId=[];
+  //      //memberData.forEach(function(member, index, array){
+  //      //  memberLineId.push(member[1]);
+  //      //  var head, tail;
+  //      //  head=member[1].slice(0,5);
+  //      //  tail=member[1].slice(29,33)
+  //      //  console.log(head+".."+tail);
+  //      //  member[1]=head.toUpperCase()+".."+tail.toUpperCase();
+  //      //});
+  //      
+  //      buildMemberTable();      
+  //      if (readTimes == toRead) {
+  //        $.loading.end();
+  //      }
+  //    });
+
+      buildMyCoursesTable();
+      //buildCoursesTable();
+      $("#addMemberInfo").hide();
+      $("#myCourseDiv").hide();
+      $("#courseDiv").hide();         
+    }
 
     function buildMemberTable() {
       var memberTable = $('#memberTable').DataTable({
@@ -877,28 +919,42 @@
       window.location.href = 'index.html';
     }
 
-    function readMemberfromDB() {
+    async function readMemberfromDB() {
       $.loading.start('Loading data');
-      firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function(snapshot) {
-        console.log("member read done");
-        var result = snapshot.val();
-        memberData = JSON.parse(result.會員資料);
-        $.loading.end();
-        
-        // 轉換 userId，從 33字元長度 "Uaabb....ccdd" ==> 顯示 "Uaabb..ccdd"
-        //memberData.forEach(function(member, index, array){
-        //  var head, tail;
-        //  head=member[1].slice(0,5);
-        //  tail=member[1].slice(29,33)
-        //  //console.log(head+".."+tail);
-        //  member[1]=head.toUpperCase()+".."+tail.toUpperCase();
-        //});        
       
-        var memberTable = $('#memberTable').DataTable();
-        memberTable.clear().draw();
-        memberTable.rows.add(memberData);
-        memberTable.draw();
+      // 改用 Heroku API
+      var apiUrl = apiUrlBase + "?API=16";
+      console.log("Reading memberData");
+      await axios.get(apiUrl).then(function (response) {
+        memberData=response.data;
       });
+      console.log("memberData is read");  
+      $.loading.end()   
+      var memberTable = $('#memberTable').DataTable();
+      memberTable.clear().draw();
+      memberTable.rows.add(memberData);
+      memberTable.draw();      
+      
+//      firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function(snapshot) {
+//        console.log("member read done");
+//        var result = snapshot.val();
+//        memberData = JSON.parse(result.會員資料);
+//        $.loading.end();
+//        
+//        // 轉換 userId，從 33字元長度 "Uaabb....ccdd" ==> 顯示 "Uaabb..ccdd"
+//        //memberData.forEach(function(member, index, array){
+//        //  var head, tail;
+//        //  head=member[1].slice(0,5);
+//        //  tail=member[1].slice(29,33)
+//        //  //console.log(head+".."+tail);
+//        //  member[1]=head.toUpperCase()+".."+tail.toUpperCase();
+//        //});        
+//      
+//        var memberTable = $('#memberTable').DataTable();
+//        memberTable.clear().draw();
+//        memberTable.rows.add(memberData);
+//        memberTable.draw();
+//      });
     }
 
     function addMember() {

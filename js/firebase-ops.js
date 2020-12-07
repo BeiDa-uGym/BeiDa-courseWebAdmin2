@@ -6,6 +6,9 @@
 //var cloudinaryPostUrl = "https://api.cloudinary.com/v1_1/beida-coupon/image/upload";
 //var presetName = "ntb4ppf4"
 
+// Heroku apiURLbase
+var apiUrlBase = "https://beida-api-for-firebase.herokuapp.com/";
+
 // 改為使用 Imgur BeiDa-Coupon 帳號
 var bearerId = "Bearer 5130399359e4fe9be958edd10450a8763df34277";
 var clientId = "Client-ID e113d4b4cf3d463";
@@ -67,51 +70,103 @@ firebase.auth().onAuthStateChanged(function (user) {
   }
 });
 
-function readFromDB() {
+async function readFromDB() {
   console.log("Read Database");
 
   $.loading.start('Loading data');
-  // 一次全讀
-  firebase.database().ref('users/三峽運動中心').once('value').then(function (snapshot) {
-    console.log("data read done");
-    //readTimes++;
-    var result = snapshot.val();
-    courseData = JSON.parse(result.團課課程.現在課程);
-    courseHistory = JSON.parse(result.團課課程.過去課程);
+  
+  //改用 Heroku API
+  var apiUrl = apiUrlBase + "?API=10";
+  console.log("Reading courseData");
+  await axios.get(apiUrl).then(function (response) {
+    courseData=response.data;
+  });
+  console.log("courseData is read");
+  
+  var apiUrl = apiUrlBase + "?API=11";
+  console.log("Reading courseHistory");
+  await axios.get(apiUrl).then(function (response) {
+    courseHistory=response.data;
+  });
+  console.log("courseHistory is read");  
+  
+  var apiUrl = apiUrlBase + "?API=12";
+  console.log("Reading courseMember");
+  await axios.get(apiUrl).then(function (response) {
+    courseMember=response.data;
+  });
+  console.log("courseMember is read");   
+  
+  var apiUrl = apiUrlBase + "?API=16";
+  console.log("Reading memberData");
+  await axios.get(apiUrl).then(function (response) {
+    memberData=response.data;
+  });
+  console.log("memberData is read");
+  
+  var apiUrl = apiUrlBase + "?API=17";
+  console.log("Reading coachSet");
+  await axios.get(apiUrl).then(function (response) {
+    coachSet=response.data;
+  });
+  console.log("coachSet is read");  
+  
+  courseNum = 0;
+  courseData.forEach(function(course, index, array){
+     var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+     if (課程號碼 > courseNum) courseNum = 課程號碼;
+  });
 
-//    if (courseData.length>0) {
-//      var tmp1 = courseData[courseData.length - 1][0];
-//      var tmp2 = parseInt(tmp1.substr(1, 4));
-//    } else tmp2 = 0;
-//
-//    if (courseHistory.length>0) {    
-//      var tmp3 = courseHistory[courseHistory.length - 1][0];
-//      var tmp4 = parseInt(tmp3.substr(1, 4));  
-//    } else tmp4 = 0;
-// 
-//    courseNum = (tmp4 > tmp2)? tmp4:tmp2;
-    
-      courseNum = 0;
-      courseData.forEach(function(course, index, array){
-         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
-         if (課程號碼 > courseNum) courseNum = 課程號碼;
-      });
-      
-      courseHistory.forEach(function(course, index, array){
-         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
-         if (課程號碼 > courseNum) courseNum = 課程號碼;
-      }); 
-    
-    //console.log(courseNum);
-
-    refreshCourse();
-    
-    memberData   = JSON.parse(result.客戶管理.會員資料);   
-    courseMember = JSON.parse(result.課程管理.課程會員);    
-    coachSet     = JSON.parse(result.教練管理.老師資料);
-    
-    $.loading.end();
+  courseHistory.forEach(function(course, index, array){
+     var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+     if (課程號碼 > courseNum) courseNum = 課程號碼;
   });  
+  
+  refreshCourse();
+  
+  $.loading.end();
+  
+  // 一次全讀
+//  firebase.database().ref('users/三峽運動中心').once('value').then(function (snapshot) {
+//    console.log("data read done");
+//    //readTimes++;
+//    var result = snapshot.val();
+//    courseData = JSON.parse(result.團課課程.現在課程);
+//    courseHistory = JSON.parse(result.團課課程.過去課程);
+//
+////    if (courseData.length>0) {
+////      var tmp1 = courseData[courseData.length - 1][0];
+////      var tmp2 = parseInt(tmp1.substr(1, 4));
+////    } else tmp2 = 0;
+////
+////    if (courseHistory.length>0) {    
+////      var tmp3 = courseHistory[courseHistory.length - 1][0];
+////      var tmp4 = parseInt(tmp3.substr(1, 4));  
+////    } else tmp4 = 0;
+//// 
+////    courseNum = (tmp4 > tmp2)? tmp4:tmp2;
+//    
+//      courseNum = 0;
+//      courseData.forEach(function(course, index, array){
+//         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+//         if (課程號碼 > courseNum) courseNum = 課程號碼;
+//      });
+//      
+//      courseHistory.forEach(function(course, index, array){
+//         var 課程號碼 = parseInt(course[0].substr(1, course[0].length));
+//         if (課程號碼 > courseNum) courseNum = 課程號碼;
+//      }); 
+//    
+//    //console.log(courseNum);
+//
+//    refreshCourse();
+//    
+//    memberData   = JSON.parse(result.客戶管理.會員資料);   
+//    courseMember = JSON.parse(result.課程管理.課程會員);    
+//    coachSet     = JSON.parse(result.教練管理.老師資料);
+//    
+//    $.loading.end();
+//  });  
   
 // 分 4 次讀，比較慢也比較出問題
 //  var toRead = 4;
@@ -171,27 +226,27 @@ function readFromDB() {
 
 }
 
-function readMemberfromDB() {
-  console.log("Read  Database");  
-  
-  var toRead = 1;
-  var readTimes = 0;  
-  
-  $.loading.start('Loading data')
-  firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function (snapshot) {
-    console.log("member read done");
-    readTimes++;
-    var result = snapshot.val();
-    memberData = JSON.parse(result.會員資料);
-
-    if (readTimes == toRead) $.loading.end();
-    
-    // 更新客戶表格
-//    var memberTable = $('#memberTable').DataTable();
-//    memberTable.clear().draw();
-//    memberTable.rows.add();
-//    memberTable.draw();
-    
-    
-  });  
-}
+//function readMemberfromDB() {
+//  console.log("Read  Database");  
+//  
+//  var toRead = 1;
+//  var readTimes = 0;  
+//  
+//  $.loading.start('Loading data')
+//  firebase.database().ref('users/三峽運動中心/客戶管理').once('value').then(function (snapshot) {
+//    console.log("member read done");
+//    readTimes++;
+//    var result = snapshot.val();
+//    memberData = JSON.parse(result.會員資料);
+//
+//    if (readTimes == toRead) $.loading.end();
+//    
+//    // 更新客戶表格
+////    var memberTable = $('#memberTable').DataTable();
+////    memberTable.clear().draw();
+////    memberTable.rows.add();
+////    memberTable.draw();
+//    
+//    
+//  });  
+//}
